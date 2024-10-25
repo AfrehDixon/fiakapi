@@ -1,5 +1,5 @@
 import { Elysia } from "elysia"; // Import Elysia framework
-import $config from "./server.config"; // Configuration file for server settings
+// import $config from "./server.config"; // Configuration file for server settings
 import dbConnection from "./db.connection"; // Database connection module
 import { cors } from '@elysiajs/cors'; // CORS middleware
 import { swagger } from '@elysiajs/swagger'; // Swagger middleware for API documentation
@@ -13,6 +13,10 @@ import $Feedback from '../fikaApp-api/src/Feedback/Feedback.api';// Importing th
 import $Cart from '../fikaApp-api/src/Cart/Cart.api';// Importing the cart API module
 
 // import $Item from '../fikaApp-api/src/Items/Item.api';// Importing the item API module
+
+
+const host = "localhost";
+const port = 3112;
 const start = async () => {
   try {
     const app = new Elysia().get('/', () => 'Hello World');
@@ -34,10 +38,10 @@ const start = async () => {
     app.use($Cart)
 
 
-    app.listen({ hostname: $config.host, port: $config.port });
+    app.listen({ hostname: host, port: port });
 
     console.log(
-      `🦊 Elysia is running at http://${$config.host}:${$config.port}`
+      `🦊 Elysia is running at http://${host}:${port}`
     );
   } catch (err) {
     console.log("<--Server Error-->", err);
