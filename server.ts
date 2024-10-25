@@ -5,6 +5,12 @@ import { cors } from '@elysiajs/cors'; // CORS middleware
 import { swagger } from '@elysiajs/swagger'; // Swagger middleware for API documentation
 // const app = require('cors');
 import { logger } from "@chneau/elysia-logger";
+import $Customer from './src/customers/customer.api'
+import $Order from './src/Orders/Order.api'
+import $Venues from './src/Venue/Venue.api'
+import $Item from './src/Item/Product.api'
+import $Feedback from './src/Feedback/Feedback.api'
+import $Cart from './src/Cart/Cart.api'
 // import $Costomer from '../fikaApp-api/src/customers/customer.api';// Importing the customer API module
 // import $Order from '../fikaApp-api/src/Orders/Order.api';// Importing the order API module
 // import $Venues from '../fikaApp-api/src/Venue/Venue.api';// Importing the venue API module
@@ -30,12 +36,12 @@ const start = async () => {
 
     await dbConnection();
 
-    // app.use($Costomer);
-    // app.use($Order);
-    // app.use($Venues)
-    // app.use($Item)
-    // app.use($Feedback)
-    // app.use($Cart)
+    app.use($Customer);
+    app.use($Order);
+    app.use($Venues)
+    app.use($Item)
+    app.use($Feedback)
+    app.use($Cart)
 
 
     app.listen({ hostname: host, port: port });
