@@ -16,7 +16,7 @@ import $Cart from '../fikaApp-api/src/Cart/Cart.api';// Importing the cart API m
 
 
 const host = "localhost";
-const port = 3112;
+const port = process.env.PORT || 4000;
 const start = async () => {
   try {
     const app = new Elysia().get('/', () => 'Hello World');
