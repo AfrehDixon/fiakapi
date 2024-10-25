@@ -1,0 +1,25 @@
+{
+  "name": "fikaApp-api",
+  "version": "1.0.50",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch server.ts"
+  },
+  "dependencies": {
+    "@chneau/elysia-logger": "^1.0.8",
+    "@elysiajs/cors": "^1.1.1",
+    "@elysiajs/swagger": "^1.1.5",
+    "@types/morgan": "^1.9.9",
+    "elysia": "latest",
+    "koa": "^2.15.3",
+    "koa-logger": "^3.2.1",
+    "mongoose": "^8.7.1",
+    "morgan": "^1.10.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5",
+    "bun-types": "latest"
+  },
+  "module": "src/index.js"
+}
