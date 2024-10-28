@@ -181,7 +181,7 @@ interface IOrder extends Document {
 const OrderSchema = new Schema<IOrder>({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // Reference to the User model
+    ref: 'Customer', // Reference to the User model
     required: true,
     index: true, // Makes it easier to search for orders by user
   },
