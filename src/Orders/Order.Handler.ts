@@ -41,14 +41,25 @@ const createOrder = async ({ body, set }: Context) => {
 
 
 // Get all orders
+// const getAllOrders = async () => {
+// 	try {
+// 		const orders = await Order.find().populate("userId", "name email");
+// 		return { status: "success", data: orders };
+// 	} catch (error: any) {
+// 		return { status: "error", message: error.message };
+// 	}
+// };
+
+
 const getAllOrders = async () => {
-	try {
-		const orders = await Order.find().populate("userId", "name email");
-		return { status: "success", data: orders };
-	} catch (error: any) {
-		return { status: "error", message: error.message };
-	}
+  try {
+    const orders = await Order.find().populate("userId", "name email");
+    return { status: "success", data: orders };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
 };
+
 
 // Get orders by user ID
 const getOrdersByUser = async ({ params }: { params: { userId: string } }) => {
