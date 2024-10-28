@@ -53,7 +53,7 @@ const createOrder = async ({ body, set }: Context) => {
 
 const getAllOrders = async () => {
   try {
-    const orders = await Order.find().populate("userId", "name email");
+    const orders = await Order.find();
     return { status: "success", data: orders };
   } catch (error: any) {
     return { status: "error", message: error.message };
