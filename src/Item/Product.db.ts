@@ -131,10 +131,10 @@ export interface SizeOption {
 export interface Product {
   name: string;
   description?: string;
-  category: 'Coffee Series' | 'Signature' | 'Fruit Teas'; 
+  category: 'Coffee Series' | 'Signature' | 'Fruit Teas';
   CategoryId: Types.ObjectId;  
   sizes: SizeOption[]; 
-  loyaltyPoints?: number; 
+  loyaltyPoints?: number;
 }
 
 const SizeOptionSchema = new Schema<SizeOption>({
