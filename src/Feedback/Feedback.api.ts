@@ -10,8 +10,8 @@ const app = new Elysia({
 
 app.post('/submit', Handler.submitFeedback, {
   body: t.Object({
-    name: t.String(),
-    email: t.String(),
+    // name: t.String(),
+    // email: t.String(),
     feedback: t.String(),
   }),
 });

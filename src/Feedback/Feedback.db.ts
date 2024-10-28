@@ -10,15 +10,15 @@ interface IFeedback extends Document {
 
 // Create the feedback schema
 const feedbackSchema = new Schema<IFeedback>({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    match: /\S+@\S+\.\S+/, // Basic email validation
-  },
+  // name: {
+  //   type: String,
+  //   required: true,
+  // },
+  // email: {
+  //   type: String,
+  //   required: true,
+  //   match: /\S+@\S+\.\S+/, // Basic email validation
+  // },
   feedback: {
     type: String,
     required: true,

@@ -3,12 +3,12 @@ import { Context } from 'elysia';
 
  const submitFeedback = async ({ body }: Context) => {
   try {
-    const { name, email, feedback } = body as any;
+    const {  feedback } = body as any;
 
-    console.log('Received body:', { name, email, feedback });
+    console.log('Received body:', { feedback });
 
  
-    if (!name || !email || !feedback) {
+    if (!feedback) {
       return {
         success: false,
         message: 'All fields (name, email, feedback) are required',
@@ -17,8 +17,8 @@ import { Context } from 'elysia';
 
   
     const newFeedback = new FeedbackModel({
-      name,
-      email,
+      // name,
+      // email,
       feedback,
     });
 
