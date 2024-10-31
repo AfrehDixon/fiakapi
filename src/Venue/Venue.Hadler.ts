@@ -168,7 +168,7 @@ export const addCategoryToVenue = async ({ params, body }: Context) => {
       items: []
       };
     
-    await venue.categories.push(newCategory);
+    venue.categories.push(newCategory);
     await venue.save();
 
 
