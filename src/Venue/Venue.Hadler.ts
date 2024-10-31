@@ -172,10 +172,10 @@ export const addCategoryToVenue = async ({ params, body }: Context) => {
     await venue.save();
 
 
-    const categoryExists = venue.categories.find(category => category.name === name);
-    if (categoryExists) {
-      return { success: false, message: "Category already exists." };
-    }
+    // const categoryExists = venue.categories.find(category => category.name === name);
+    // if (categoryExists) {
+    //   return { success: false, message: "Category already exists." };
+    // }
 
     venue.categories.push({
       name, items: [],
