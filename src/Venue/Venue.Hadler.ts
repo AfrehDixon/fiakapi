@@ -20,66 +20,66 @@ export const createVenue = async ({ body, set }: Context) => {
   }
 };
 
-export const getVenueByCategoryId = async ({ params }: any) => {
-  try {
-    const categoryId = params.venueId; // rename this param in your routes to categoryId
+// export const getVenueByCategoryId = async ({ params }: any) => {
+//   try {
+//     const categoryId = params.venueId; // rename this param in your routes to categoryId
 
-    // Validate if it's a valid ObjectId
-    if (!Types.ObjectId.isValid(categoryId)) {
-      return {
-        status: 400,
-        message: 'Invalid category ID format'
-      };
-    }
+//     // Validate if it's a valid ObjectId
+//     if (!Types.ObjectId.isValid(categoryId)) {
+//       return {
+//         status: 400,
+//         message: 'Invalid category ID format'
+//       };
+//     }
 
-    // Find venue that has the category with the given ID
-    const venue = await Venue.findOne({
-      'categories._id': new Types.ObjectId(categoryId)
-    });
+//     // Find venue that has the category with the given ID
+//     const venue = await Venue.findOne({
+//       'categories._id': new Types.ObjectId(categoryId)
+//     });
 
-    if (!venue) {
-      return {
-        status: 404,
-        message: 'No venue found with this category'
-      };
-    }
+//     if (!venue) {
+//       return {
+//         status: 404,
+//         message: 'No venue found with this category'
+//       };
+//     }
 
-    // Find the specific category in the venue
-    const category = venue.categories.find(
-      cat => cat._id && cat._id.toString() === categoryId
-    );
+//     // Find the specific category in the venue
+//     const category = venue.categories.find(
+//       cat => cat._id && cat._id.toString() === categoryId
+//     );
 
-    // Find all products that belong to this category
-    const products = await Product.find({
-      CategoryId: new Types.ObjectId(categoryId)
-    });
+//     // Find all products that belong to this category
+//     const products = await Product.find({
+//       CategoryId: new Types.ObjectId(categoryId)
+//     });
 
-    return {
-      status: 200,
-      message: 'Venue, category, and products retrieved successfully',
-      data: {
-        venue: {
-          _id: venue._id,
-          name: venue.name,
-          address: venue.address
-        },
-        category: {
-          _id: category?._id,
-          name: category?.name,
-          products: products
-        }
-      }
-    };
+//     return {
+//       status: 200,
+//       message: 'Venue, category, and products retrieved successfully',
+//       data: {
+//         venue: {
+//           _id: venue._id,
+//           name: venue.name,
+//           address: venue.address
+//         },
+//         category: {
+//           _id: category?._id,
+//           name: category?.name,
+//           products: products
+//         }
+//       }
+//     };
 
-  } catch (error) {
-    console.error('Error in getVenueByCategoryId:', error);
-    return {
-      status: 500,
-      message: 'Error retrieving venue and products',
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
-    };
-  }
-};
+//   } catch (error) {
+//     console.error('Error in getVenueByCategoryId:', error);
+//     return {
+//       status: 500,
+//       message: 'Error retrieving venue and products',
+//       error: error instanceof Error ? error.message : 'Unknown error occurred'
+//     };
+//   }
+// };
 
 
 
@@ -168,14 +168,14 @@ export const addCategoryToVenue = async ({ params, body }: Context) => {
       items: []
       };
     
-    venue.categories.push(newCategory);
+    await venue.categories.push(newCategory);
     await venue.save();
 
 
-    // const categoryExists = venue.categories.find(category => category.name === name);
-    // if (categoryExists) {
-    //   return { success: false, message: "Category already exists." };
-    // }
+    const categoryExists = venue.categories.find(category => category.name === name);
+    if (categoryExists) {
+      return { success: false, message: "Category already exists." };
+    }
 
     venue.categories.push({
       name, items: [],
@@ -191,3 +191,80 @@ export const addCategoryToVenue = async ({ params, body }: Context) => {
 
 
 
+export const getVenueWithCategoriesAndItems = async ({ params }: Context) => {
+  const { venueId } = params;
+
+  if (!Types.ObjectId.isValid(venueId)) {
+    return { success: false, message: 'Invalid venue ID.' };
+  }
+
+  try {
+    const venue = await Venue.findById(venueId).populate('categories.items');
+    if (!venue) {
+      return { success: false, message: 'Venue not found.' };
+    }
+    console.log(venue)
+    return {
+      message: 'Venue, category, and products retrieved successfully',
+      data: { venue },
+    };
+  } catch (error) {
+    return { success: false, message: error instanceof Error ? error.message : 'An unknown error occurred' };
+  }
+};
+
+
+
+export const addProductToCategory = async ({ params, body }: Context) => {
+  const { categoryId } = params;
+  const { name, description, venueId, sizes } = body as { name: string; description: string; venueId: string; sizes: any };
+
+  // Validate the IDs
+  if (!Types.ObjectId.isValid(categoryId) || !Types.ObjectId.isValid(venueId)) {
+    return { success: false, message: 'Invalid category ID or venue ID.' };
+  }
+
+  try {
+    // Find the venue containing the specified category
+    const venue = await Venue.findOne({ 'categories._id': categoryId });
+    if (!venue) {
+      return { success: false, message: "Venue not found." };
+    }
+
+    // Locate the category within the venue's categories
+    const category = venue.categories.find(cat => cat._id && cat._id.toString() === categoryId);
+    
+    // Check if the category was found
+    if (!category) {
+      return { success: false, message: "Category not found within venue." };
+    }
+
+    // Create the new product
+    const newItem = await Product.create({
+      name,
+      description,
+      CategoryId: category._id, // Use the category _id
+      venueId,
+      sizes,
+    });
+
+    // Add the new item ID to the category's items array
+    category.items.push(newItem._id); // Assuming you want to keep track of the items in the category
+
+    // Save the updated venue document
+    await venue.save();
+
+    return { 
+      success: true, 
+      message: "Product added to category successfully.", 
+      data: newItem 
+    };
+    
+  } catch (error) {
+    console.error("Error in addProductToCategory:", error);
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : 'An unknown error occurred' 
+    };
+  }
+};

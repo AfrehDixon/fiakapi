@@ -46,9 +46,7 @@ app.post("/create", Handler.createItem, {
   
 });
 
-
 app.put("/update/:id", Handler.updateItem );
-
 
 app.delete('/deleteAll ',  async () => {
 	

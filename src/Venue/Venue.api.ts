@@ -8,7 +8,9 @@ import {
   deleteVenue,
   deleteAllVenues,
   addCategoryToVenue,
-  getVenueByCategoryId
+  // getVenueByCategoryId,
+  getVenueWithCategoriesAndItems,
+  addProductToCategory
 } from './Venue.Hadler'; // Adjust the path as needed
 import ItemDb from '../Item/Product.db';
 
@@ -34,7 +36,13 @@ app.post('/new', createVenue, {
 app.get('/get', getAllVenues);
 
 // Route to get a specific venue by ID
-app.get('/:venueId', getVenueByCategoryId, {
+// app.get('/:venueId', getVenueByCategoryId, {
+//   params: t.Object({
+//     venueId: t.String(), // Venue ID
+//   }),
+// });
+
+app.get('/:venueId', getVenueWithCategoriesAndItems , {
   params: t.Object({
     venueId: t.String(), // Venue ID
   }),
@@ -102,6 +110,33 @@ app.post('/:venueId/categories', addCategoryToVenue, {
   }),
   body: t.Object({
     name: t.String(),
+  }),
+});
+
+
+// app.post('/categories/:categoryId/add-product', addProductToCategory, {
+//   params: t.Object({
+//     categoryId: t.String(),
+//   }),
+//   body: t.Object({
+//     productId: t.String(),
+//   }),
+// });
+
+app.post('/category/:categoryId', addProductToCategory, {
+  params: t.Object({
+    categoryId: t.String(),
+  }),
+  body: t.Object({
+    name: t.String(),
+    description: t.Optional(t.String()),
+    venueId: t.String(),
+    sizes: t.Array(
+      t.Object({
+        name: t.String(),
+        price: t.Number(),
+      })
+    ),
   }),
 });
 
