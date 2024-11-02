@@ -1,124 +1,80 @@
 import * as mongoose from "mongoose";
-import dbCustomers from "./customer.db"; // Import the customer model
+import Customer from "./customer.db"; // Import the customer model
 import { Context } from "elysia";
+import jwt from "@elysiajs/jwt";
 
 const NewCustomer = async ({ body }: Context) => {
 	try {
-		// Destructure required fields from the request body
-		const { fullname, email, password, phoneNumber } = body as any; // Include phoneNumber
+		const { fullname, email, password, phoneNumber } = body as any;
 
-		// Check if the customer already exists
-		const existingCustomer = await dbCustomers.findOne({
+		const existingCustomer = await Customer.findOne({
 			email,
 		});
 
+		console.log(body);
 		if (existingCustomer) {
 			throw new Error("Email has already been used");
 		}
-
-		// Prepare the customer data, including payment methods
+		const hashedPassword = await Bun.password.hash(password);
 		const customerData = {
 			fullname,
 			email,
-			password, // You should hash the password before storing it for security reasons
-			paymentMethods: [
-				{
-					type: "MTN Mobile Money",
-					details: { phoneNumber }, // Add phone number to the payment method
-					default: false, // Set default to false or true based on your logic
-				},
-			],
+			password: hashedPassword,
+			phoneNumber,
 		};
 
-		// Create a new customer using the dbCustomers model
-		const newCustomer = await dbCustomers.create(customerData);
+		const newCustomer = new Customer(customerData);
+		await newCustomer.save();
+		console.log(newCustomer);
 
-		if (!newCustomer || !newCustomer._id) {
-			throw new Error("Signup Error: Customer registration failed");
-		}
-
-		// Return success response
 		return {
 			success: true,
 			message:
 				"Customer Account Created Successfully. Please login to continue",
-			data: newCustomer,
+			newCustomer,
 		};
 	} catch (err) {
-		// Return error response
 		return {
 			success: false,
 			message: err instanceof Error ? err.message : "An unknown error occurred",
 		};
 	}
 };
-export const addPhoneNumber = async (userId: string, phoneNumber: string) => {
+
+const Login = async ({ body }: Context) => {
 	try {
-		// Find the user by ID
-		const user = await dbCustomers.findById(userId);
-		if (!user) {
-			return { success: false, error: "User not found" };
+		const { email, password } = body as any;
+		const existingCustomer = await Customer.findOne({ email });
+		if (!existingCustomer) {
+			return {
+				success: false,
+				message: "Email is incorrect or doesn't exist",
+			};
 		}
 
-		// Create new payment method
-		const newPaymentMethod: PaymentMethodData = {
-			type: "MTN Mobile Money",
-			details: { phoneNumber }, // Assign the phone number
-			default: false, // Default to false initially
-		};
-
-		// Initialize paymentMethods array if it doesn't exist
-		if (!Array.isArray(user.paymentMethods)) {
-			user.paymentMethods = [];
+		const isMatch = await Bun.password.verify(
+			new Uint8Array(Buffer.from(password)),
+			new Uint8Array(Buffer.from(existingCustomer.password))
+		);
+		if (isMatch) {
+			return {
+				success: true,
+				message: "Customer login successful",
+				customer: existingCustomer,
+			};
+		} else {
+			return {
+				success: false,
+				message: "Password or email is incorrect",
+			};
 		}
-
-		// Add the new payment method to the array
-		user.paymentMethods.push(newPaymentMethod);
-
-		// Save the updated user document
-		await user.save();
-
-		// Return success message with updated payment methods
+	} catch (err) {
+		console.error("Login error:", err);
 		return {
-			success: true,
-			message: "Phone number added successfully",
-			paymentMethods: user.paymentMethods,
+			success: false,
+			message: err instanceof Error ? err.message : "An unknown error occurred",
 		};
-	} catch (error: any) {
-		return { success: false, error: error.message };
 	}
 };
 
-// Define the PaymentMethodData type
-interface PaymentMethodData {
-	type: "MTN Mobile Money" | "Credit Card";
-	details: {
-		phoneNumber: string;
-	};
-	default: boolean;
-}
-
-export const getPhoneNumbers = async (userId: string) => {
-	try {
-		// Find the user by ID
-		const user = await dbCustomers.findById(userId);
-
-		if (!user) {
-			return { success: false, error: "User not found" };
-		}
-
-		// Extract phone numbers from payment methods
-		const phoneNumbers = user.paymentMethods
-			.filter((method) => method.details.phoneNumber)
-			.map((method) => ({
-				type: method.type,
-				phoneNumber: method.details.phoneNumber,
-			}));
-
-		return { success: true, phoneNumbers };
-	} catch (error: any) {
-		return { success: false, error: error.message };
-	}
-};
-
-export default { NewCustomer, addPhoneNumber, getPhoneNumbers };
+export default { NewCustomer, Login };

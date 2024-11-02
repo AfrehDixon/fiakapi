@@ -1,18 +1,19 @@
-import Cart from './Cart.db';
+import { Elysia, t, Context } from 'elysia';
+import Checkout from './Checkout.db';
 import ItemDb from '../Item/Product.db';
-import { Context } from 'elysia';
-
-interface CheckoutBody {
-  cartItems: { itemId: string }[];
-}
 import QRCode from 'qrcode';
 
+interface CheckoutBody {
+  userId: any;
+  cartItems: { itemId: string }[];
+  totalAmount: number; // Assume total amount is included in the body
+}
 
+const checkoutRouter = new Elysia();
 
-const checkout = async (context: Context) => {
-  const { body } = context;
-  const { cartItems } = body as CheckoutBody;
+checkoutRouter.post('/checkout', async ({ body }: { body: CheckoutBody }) => {
   try {
+    const { cartItems, totalAmount } = body;
     const loyaltyData = [];
 
     for (const cartItem of cartItems) {
@@ -23,7 +24,7 @@ const checkout = async (context: Context) => {
 
       const pointsAwarded = item.loyaltyPoints;
       const qrCodeData = `Item ID: ${cartItem.itemId}, Points: ${pointsAwarded}`;
-      const qrCodeUrl = await QRCode.toDataURL(qrCodeData); // Generate QR code
+      const qrCodeUrl = await QRCode.toDataURL(qrCodeData);
 
       loyaltyData.push({
         itemId: cartItem.itemId,
@@ -32,19 +33,34 @@ const checkout = async (context: Context) => {
       });
     }
 
+    const checkout = new Checkout({
+      userId: body.userId,  // Ensure userId is sent in the body
+      items: cartItems,
+      totalAmount,
+    });
 
+    await checkout.save();
 
     return {
       success: true,
-      message: "Checkout successful",
-      // totalPrice: totalPrice, // Accept total price from the frontend
+      message: 'Checkout initiated successfully',
       data: loyaltyData,
+      checkout,
     };
   } catch (error) {
-    return { success: false, message: (error as Error).message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'An error occurred',
+    };
   }
-};
+}, {
+  body: t.Object({
+    cartItems: t.Array(t.Object({
+      itemId: t.String(),
+    })),
+    totalAmount: t.Number(),
+    userId: t.String(), // Ensure userId is provided in the request body
+  }),
+});
 
-export {  checkout };
-
-
+export default checkoutRouter;

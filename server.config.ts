@@ -1,5 +1,7 @@
+import jwt from "@elysiajs/jwt";
+
 const config = {
-//   jwtKey: "090838492849328493829482989294823989824",
+  jwtKey: "090838492849328493829482989294823989824",
   host: "localhost",
   port: 3112,
 };
