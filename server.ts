@@ -23,7 +23,7 @@ const start = async () => {
   try {
     const app = new Elysia().get('/', () => 'Hello World');
     app.use(logger());
-    app.use(jwt({name: 'jwt',secret: config.jwtKey}))
+    app.use(jwt({name: 'jwt',secret: config.jwtKey ,cookie: true, }))
 
     
   app.use(cors());

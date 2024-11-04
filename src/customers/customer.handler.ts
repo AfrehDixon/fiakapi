@@ -1,7 +1,9 @@
 import * as mongoose from "mongoose";
 import Customer from "./customer.db"; // Import the customer model
 import { Context } from "elysia";
-import jwt from "@elysiajs/jwt";
+import jwt from 'jsonwebtoken';
+// import jwt from "@elysiajs/jwt";
+// import jwt from 'jsonwebtoken';
 
 const NewCustomer = async ({ body }: Context) => {
 	try {
@@ -40,8 +42,8 @@ const NewCustomer = async ({ body }: Context) => {
 		};
 	}
 };
-
 const Login = async ({ body }: Context) => {
+// const Login = async ({ body,jwt }: Context) => {
 	try {
 		const { email, password } = body as any;
 		const existingCustomer = await Customer.findOne({ email });
@@ -57,10 +59,18 @@ const Login = async ({ body }: Context) => {
 			new Uint8Array(Buffer.from(existingCustomer.password))
 		);
 		if (isMatch) {
+			const token = jwt.sign({ id: existingCustomer._id, email: existingCustomer.email }, '123456');
+
+			const response = new Response(null, {
+				headers: {
+					'Set-Cookie': `auth_token=${token}; HttpOnly; Path=/;`
+				}
+			});
 			return {
 				success: true,
 				message: "Customer login successful",
 				customer: existingCustomer,
+				token,
 			};
 		} else {
 			return {
