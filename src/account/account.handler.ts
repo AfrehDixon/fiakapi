@@ -6,7 +6,17 @@ const addAccount = async ({ body }: Context) => {
         const { userId, networkType, number } = body as any;
 
 
-        const newaccount = {userId,networkType,number}
+        const newaccount = { userId, networkType, number }
+        
+
+        const existingAccount = await Account.findOne({ number });
+
+        if (existingAccount) {
+            return {
+                success: false,
+                message: "Account already exists",
+            };
+        }
         
         
         const account = new Account(newaccount);
