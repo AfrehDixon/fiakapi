@@ -42,7 +42,7 @@ const addAccount = async ({ body }: Context) => {
 const getAccounts = async ({ params }: any) => {
     const userId = params.userId
 	try {
-		const accounts = await Account.find({ userId }).sort({ createdAt: 1 });
+		const accounts = await Account.find({ userId }).sort({ createdAt: -1 });
 		return {
 			success: true,
 			message: "Accounts retrieved successfully",
