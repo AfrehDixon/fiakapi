@@ -3,3 +3,4 @@ export enum EnumDatabaseConnectionEnv {
   "PROD" = "PROD",
   "STAGING" = "STAGING",
 }
+

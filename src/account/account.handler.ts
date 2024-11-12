@@ -47,4 +47,35 @@ const getAccounts = async ({ params }: any) => {
 	}
 };
 
-export default { addAccount, getAccounts };
+const deleteAccouts = async ({ params }: any) => {
+    const userId = params.userId
+    try {
+        const accounts = await Account.deleteMany({ userId });
+        return {
+            success: true,
+            message: "Accounts deleted successfully",
+            accounts,
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message:
+                error instanceof Error ? error.message : "An unknown error occurred",
+        };
+    }
+}
+
+const deleteAccount = async ({ params }: any) => {  
+    const { id } = params;
+    try {
+        const account = await Account.findByIdAndDelete(id);
+        if (!account) {
+            return { error: "Account not found" };
+        }
+        return { message: "Account deleted successfully" };
+    } catch (error) {
+        return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+    }
+}
+
+export default { addAccount, getAccounts , deleteAccount , deleteAccouts};

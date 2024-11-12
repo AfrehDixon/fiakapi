@@ -18,6 +18,19 @@ app.get('/:userId', Handler.getAccounts, {
     })
 });
 
+app.delete('/:userId', Handler.deleteAccouts, {
+    params: t.Object({
+        userId: t.String()
+    })
+});
+
+app.delete('/delete/:id', Handler.deleteAccount, {
+    params: t.Object({
+        id: t.String()
+    })
+}
+)
+
 
 
 export default app
