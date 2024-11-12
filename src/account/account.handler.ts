@@ -8,7 +8,7 @@ const addAccount = async ({ body }: Context) => {
 
         const newaccount = {userId,networkType,number}
         
-        // Create a new account instance with the provided body data
+        
         const account = new Account(newaccount);
         
         console.log(account);
@@ -32,7 +32,7 @@ const addAccount = async ({ body }: Context) => {
 const getAccounts = async ({ params }: any) => {
     const userId = params.userId
 	try {
-		const accounts = await Account.find({ userId });
+		const accounts = await Account.find({ userId }).sort({ createdAt: 1 });
 		return {
 			success: true,
 			message: "Accounts retrieved successfully",
