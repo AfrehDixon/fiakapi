@@ -14,6 +14,7 @@ import $Cart from './src/Cart/Cart.api'
 import $Account from "./src/account/account.api"
 import jwt from "@elysiajs/jwt";
 import config from "./server.config";
+import $Email from './utils/email.api'
 
 
 
@@ -40,6 +41,7 @@ const start = async () => {
     app.use($Feedback)
     app.use($Cart)
     app.use($Account)
+    app.use($Email)
 
 
     app.listen({ hostname: host, port: port });
